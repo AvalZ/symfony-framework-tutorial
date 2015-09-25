@@ -1,5 +1,3 @@
-<?php
+<?php $name = $request->get('name', 'World') ?>
 
-$input = $request->get('name', 'World');
-
-$response->setContent(sprintf('Bye %s', htmlspecialchars($input, ENT_QUOTES, 'UTF-8')));
+Bye <?php echo htmlspecialchars($name, ENT_QUOTES, 'UTF-8')?>
