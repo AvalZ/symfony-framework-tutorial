@@ -2,7 +2,8 @@
     "require": {
         "symfony/http-foundation": "^2.7",
         "symfony/routing": "^2.7",
-        "symfony/http-kernel": "^2.7"
+        "symfony/http-kernel": "^2.7",
+        "phpunit/phpunit": "^4.8"
     },
 		"autoload": {
 			"psr-0": {
