@@ -8,11 +8,19 @@ use Symfony\Component\Routing;
 use Symfony\Component\HttpKernel;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
+$request = Request::createFromGlobals();
+$routes = include __DIR__.'/../src/app.php';
+
+$context = new Routing\RequestContext();
+$matcher = new Routing\Matcher\UrlMatcher($routes, $context);
+$errorListener = new HttpKernel\EventListener\ExceptionListener('Calendar\\Controller\\ErrorController::exceptionAction');
+$resolver = new HttpKernel\Controller\ControllerResolver();
+
 $dispatcher = new EventDispatcher();
-$dispatcher->addSubscriber(new Simplex\ContentLengthListener());
-$dispatcher->addSubscriber(new Simplex\GoogleListener());
+$dispatcher->addSubscriber(new HttpKernel\EventListener\RouterListener($matcher));
+$dispatcher->addSubscriber($errorListener);
 
-$framework = new Simplex\Framework($dispatcher, $matcher, $resolver);
-$framework = new HttpKernel\HttpCache\HttpCache($framework, new HttpKernel\HttpCache\Store(__DIR__.'/../cache'));
+$framework = new Simplex\Framework($dispatcher, $resolver);
 
-$response = $framework->handle($request)->send();
+$response = $framework->handle($request);
+$response->send();
