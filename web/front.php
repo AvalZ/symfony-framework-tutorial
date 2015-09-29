@@ -9,11 +9,10 @@ use Symfony\Component\HttpKernel;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 $dispatcher = new EventDispatcher();
-
-$dispatcher->addListener('response', array(new Simplex\ContentLengthListener(), 'onResponse'), -255);
-$dispatcher->addListener('response', array(new Simplex\GoogleListener(), 'onResponse'));
+$dispatcher->addSubscriber(new Simplex\ContentLengthListener());
+$dispatcher->addSubscriber(new Simplex\GoogleListener());
 
 $framework = new Simplex\Framework($dispatcher, $matcher, $resolver);
-$response = $framework->handle($request);
+$framework = new HttpKernel\HttpCache\HttpCache($framework, new HttpKernel\HttpCache\Store(__DIR__.'/../cache'));
 
-$response->send();
+$response = $framework->handle($request)->send();
