@@ -3,24 +3,16 @@
 require_once __DIR__.'/../vendor/autoload.php';
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing;
-use Symfony\Component\HttpKernel;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+
+$routes = include __DIR__.'/../src/app.php';
+$sc = include __DIR__.'/../src/container.php';
+
+$sc->setParameter('debug', true);
+
+echo $sc->getParameter('debug');
 
 $request = Request::createFromGlobals();
-$routes = include __DIR__.'/../src/app.php';
 
-$context = new Routing\RequestContext();
-$matcher = new Routing\Matcher\UrlMatcher($routes, $context);
-$errorListener = new HttpKernel\EventListener\ExceptionListener('Calendar\\Controller\\ErrorController::exceptionAction');
-$resolver = new HttpKernel\Controller\ControllerResolver();
+$response = $sc->get('framework')->handle($request);
 
-$dispatcher = new EventDispatcher();
-$dispatcher->addSubscriber(new HttpKernel\EventListener\RouterListener($matcher));
-$dispatcher->addSubscriber($errorListener);
-
-$framework = new Simplex\Framework($dispatcher, $resolver);
-
-$response = $framework->handle($request);
 $response->send();
